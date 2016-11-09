@@ -16,4 +16,5 @@ enum ACTUATOR_CMD
 };
 void button_task();
 void rf_task();
+void actuator_task();
 #endif /* AUTOSWITCH_H */

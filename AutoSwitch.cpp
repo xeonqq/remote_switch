@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include "RF24.h"
 #include "RF_Manager.h"
+#include "Motor.h"
 
 Button button = Button(4);
 Scheduler runner;
@@ -12,8 +13,11 @@ Scheduler runner;
 RF24 radio(7,8);
 RF_Manager rf_manager(radio, WHOIAM);
 
+Motor motor(A4, A5, 5);
+
 Task t1_button(10, TASK_FOREVER, &button_task);
 Task t2_rf(20, TASK_FOREVER, &rf_task);
+Task t3_actuator(20, TASK_FOREVER, &actuator_task);
 
 void on_button_callback(Button::Event e) {
 	if (rf_manager.radio_number() == ACTUATOR)
@@ -44,6 +48,7 @@ void rf_task()
 void setup() {
 	Serial.begin(115200);
 	Serial.println(F("Test"));
+	motor.setup();
 
 	radio.begin();
 
@@ -66,10 +71,13 @@ void setup() {
 	radio.startListening();
 
 	button.register_cb(on_button_callback);
+
 	runner.addTask(t1_button);
 	t1_button.enable();
 	runner.addTask(t2_rf);
 	t2_rf.enable();
+	runner.addTask(t3_actuator);
+	t3_actuator.enable();
 }
 
 void user_task()
@@ -82,7 +90,22 @@ void actuator_task()
 {
 	if (rf_manager.radio_number() == USER)
 		return;
-	
+
+	ACTUATOR_CMD act_cmd = rf_manager.recved_actuator_cmd();
+	switch(act_cmd)
+	{
+		case TURN_FORWARD:
+			motor.forward();
+			break;
+		case TURN_BACKWARD:
+			motor.backward();
+			break;
+		case TURN_STOP:
+			motor.stop();
+			break;
+		default:
+			break;
+	}
 }
 
 void loop() {
