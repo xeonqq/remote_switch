@@ -3,11 +3,11 @@
 # --- nano ide 1.6
 BOARD_TAG   = nano
 BOARD_SUB   = atmega328
-ARDUINO_DIR = /home/qq/arduino-1.6.0
+ARDUINO_DIR = ${HOME}/Downloads/arduino-1.8.1
 ARDUINO_SKETCHBOOK = ${PWD}
 ARDUINO_LIBS = RF24 SPI TaskScheduler
 MONITOR_BAUDRATE = 115200
-include ${HOME}/repo/Arduino-Makefile/Arduino.mk
+include ${PWD}/Arduino-Makefile/Arduino.mk
 
 
 #BOARD_TAG    = uno
